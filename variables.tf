@@ -556,6 +556,7 @@ variable "node_pools" {
     max_pods     = string
     node_taints  = list(string)
     node_labels  = map(string)
+    ultra_ssd_enabled = optional(string, "false")
   }))
 
   default = {
@@ -580,7 +581,7 @@ variable "node_pools" {
       "node_labels" = {
         "workload.sas.com/class"        = "compute"
         "launcher.sas.com/prepullImage" = "sas-programming-environment"
-      }
+      } 
     },
     stateless = {
       "machine_type" = "Standard_D4s_v5"

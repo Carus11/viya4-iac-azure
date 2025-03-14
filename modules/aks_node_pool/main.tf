@@ -25,6 +25,7 @@ resource "azurerm_kubernetes_cluster_node_pool" "autoscale_node_pool" {
   node_taints                  = var.node_taints
   orchestrator_version         = var.orchestrator_version
   tags                         = var.tags
+  ultra_ssd_enabled            = var.ultra_ssd_enabled
 
   lifecycle {
     ignore_changes = [node_count]
@@ -52,4 +53,5 @@ resource "azurerm_kubernetes_cluster_node_pool" "static_node_pool" {
   node_taints                  = var.node_taints
   orchestrator_version         = var.orchestrator_version
   tags                         = var.tags
+  ultra_ssd_enabled            = var.ultra_ssd_enabled
 }
