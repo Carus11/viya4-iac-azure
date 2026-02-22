@@ -1,10 +1,10 @@
-# !NOTE! - These are only a subset of CONFIG-VARS.md provided as examples.
+#!NOTE! - These are only a subset of CONFIG-VARS.md provided as examples.
 # Customize this file to add any variables from 'CONFIG-VARS.md' whose default
 # values you want to change.
 
 # ****************  REQUIRED VARIABLES  ****************
 # These required variables' values MUST be provided by the User
-prefix   = "<prefix-value>" # this is a prefix that you assign for the resources to be created
+prefix   = "<prefix-value>"
 location = "<azure-location-value>" # e.g., "eastus2"
 # ****************  REQUIRED VARIABLES  ****************
 
@@ -23,7 +23,7 @@ tags = {} # for example: { "owner|email" = "<you>@<domain>.<com>", "key1" = "val
 #                   need an external database server remove the 'postgres_servers'
 #                   block below.
 postgres_servers = {
-  default = {},
+ default = {},
 }
 
 # Azure Container Registry config
@@ -32,28 +32,42 @@ container_registry_sku              = "Standard"
 container_registry_admin_enabled    = false
 
 # AKS config
-kubernetes_version         = "1.33"
+kubernetes_version         = "1.32"
 default_nodepool_min_nodes = 2
+
 default_nodepool_vm_type   = "Standard_E8s_v5"
 
-# AKS Node Pools config
+# ****************  OPTIONAL CAS CONFIGURATION  ****************
+# This configuration is optimized for SAS Viya Programming-only deployments.
+# 
+# Two options for making CAS optional:
+# 1. Keep the cas block commented out (no CAS node pool created)
+#    - No CAS node pool created
+#    - CAS cannot be deployed without infrastructure changes
+#
+# 2. Set min_nodes=0 for cas node pool (uncomment the cas block below)
+#    - Creates just node pool metadata
+#    - No VMs provisioned until CAS workload is deployed
+#    - Autoscaler provisions nodes on-demand when needed
+#    - Enables CAS deployment without infrastructure changes
+# ******************************************************************
 node_pools = {
-  cas = {
-    "machine_type" = "Standard_E16ds_v5"
-    "os_disk_size" = 200
-    "min_nodes"    = 2
-    "max_nodes"    = 3
-    "max_pods"     = 110
-    "node_taints"  = ["workload.sas.com/class=cas:NoSchedule"]
-    "node_labels" = {
-      "workload.sas.com/class" = "cas"
-    }
-  },
+#   cas = {
+#     "machine_type"          = "Standard_E16ds_v5"
+#     "os_disk_size"          = 200
+#     "min_nodes"             = 0
+#     "max_nodes"             = 1
+#     "max_pods"              = 110
+#     "node_taints"           = ["workload.sas.com/class=cas:NoSchedule"]
+#     "node_labels" = {
+#       "workload.sas.com/class" = "cas"
+#     }
+#   },
   compute = {
     "machine_type" = "Standard_D4ds_v5"
     "os_disk_size" = 200
-    "min_nodes"    = 2
-    "max_nodes"    = 3
+    "min_nodes"    = 1
+    "max_nodes"    = 1
     "max_pods"     = 110
     "node_taints"  = ["workload.sas.com/class=compute:NoSchedule"]
     "node_labels" = {
@@ -64,7 +78,7 @@ node_pools = {
   stateless = {
     "machine_type" = "Standard_D4s_v5"
     "os_disk_size" = 200
-    "min_nodes"    = 2
+    "min_nodes"    = 1
     "max_nodes"    = 4
     "max_pods"     = 110
     "node_taints"  = ["workload.sas.com/class=stateless:NoSchedule"]
@@ -75,8 +89,8 @@ node_pools = {
   stateful = {
     "machine_type" = "Standard_D4s_v5"
     "os_disk_size" = 200
-    "min_nodes"    = 2
-    "max_nodes"    = 3
+    "min_nodes"    = 1
+    "max_nodes"    = 2
     "max_pods"     = 110
     "node_taints"  = ["workload.sas.com/class=stateful:NoSchedule"]
     "node_labels" = {
@@ -87,13 +101,18 @@ node_pools = {
 
 # Jump Box
 create_jump_public_ip = true
-jump_vm_admin         = "jumpuser"
+jump_vm_admin        = "jumpuser"
+jump_vm_machine_type = "Standard_B2s"
 
-# Storage for Viya Compute Services
-# Supported storage_type values
-#    "standard" - Custom managed NFS Server VM and disks
-#    "ha"     - Azure NetApp Files managed service
-storage_type = "ha"
-# required ONLY when storage_type = ha for Azure NetApp Files service
-netapp_service_level = "Premium"
-netapp_size_in_tb    = 4
+# Storage for SAS Viya CAS/Compute
+storage_type = "standard"
+
+# required ONLY when storage_type is "standard" to create NFS Server VM
+create_nfs_public_ip = false
+nfs_vm_admin         = "nfsuser"
+nfs_vm_machine_type  = "Standard_D4s_v5"
+nfs_raid_disk_size   = 256
+nfs_raid_disk_type   = "Standard_LRS"
+
+# NOTE: For multi-zone deployments, keep the CAS configuration changes above
+#       and refer to sample-input-multizone.tfvars for additional zone settings

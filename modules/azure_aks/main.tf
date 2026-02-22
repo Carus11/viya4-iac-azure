@@ -12,6 +12,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
 
   sku_tier                          = var.aks_cluster_sku_tier
   support_plan                      = var.cluster_support_tier
+  node_os_upgrade_channel           = var.community_node_os_upgrade_channel
   role_based_access_control_enabled = true
   http_application_routing_enabled  = false
   disk_encryption_set_id            = var.aks_node_disk_encryption_set_id
@@ -23,6 +24,10 @@ resource "azurerm_kubernetes_cluster" "aks" {
   private_cluster_enabled = var.aks_private_cluster
   private_dns_zone_id     = var.aks_private_cluster && var.aks_cluster_private_dns_zone_id != "" ? var.aks_cluster_private_dns_zone_id : (var.aks_private_cluster ? "System" : null)
   run_command_enabled     = var.aks_cluster_run_command_enabled
+
+  # OIDC issuer must always be enabled if workload identity is enabled
+  oidc_issuer_enabled       = var.enable_workload_identity
+  workload_identity_enabled = var.enable_workload_identity
 
   network_profile {
     # Docs on AKS Advanced Networking config
@@ -38,7 +43,10 @@ resource "azurerm_kubernetes_cluster" "aks" {
     network_plugin_mode = var.aks_network_plugin_mode
     service_cidr        = var.aks_service_cidr
     dns_service_ip      = var.aks_dns_service_ip
-    pod_cidr            = var.aks_network_plugin == "kubenet" ? var.aks_pod_cidr : null
+    pod_cidr = (
+      var.aks_network_plugin == "kubenet" ||
+      (var.aks_network_plugin == "azure" && var.aks_network_plugin_mode == "overlay")
+    ) ? var.aks_pod_cidr : null
     outbound_type       = var.cluster_egress_type
     load_balancer_sku   = "standard"
   }

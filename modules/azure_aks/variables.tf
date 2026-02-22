@@ -46,6 +46,13 @@ variable "rbac_aad_tenant_id" {
   default     = null
 }
 
+## variable for Workload Identity in AKS
+variable "enable_workload_identity" {
+  description = "Enable Azure AD Workload Identity (also enables OIDC issuer for the cluster)"
+  type        = bool
+  default     = false
+}
+
 
 variable "aks_cluster_sku_tier" {
   description = "The SKU Tier that should be used for this Kubernetes Cluster. Possible values are Free, Standard (which includes the Uptime SLA) and Premium. Defaults to Free"
@@ -159,7 +166,7 @@ variable "aks_azure_policy_enabled" {
 variable "kubernetes_version" {
   description = "The AKS cluster K8s version"
   type        = string
-  default     = "1.31"
+  default     = "1.33"
 }
 
 variable "aks_cluster_endpoint_public_access_cidrs" {
@@ -276,4 +283,15 @@ variable "aks_cluster_run_command_enabled" {
 variable "node_resource_group_name" {
   type    = string
   default = ""
+}
+
+# Community Contribution
+variable "community_node_os_upgrade_channel" {
+  type = string
+  default = "NodeImage"
+  description = "Community Configuration Option. Controls the upgrade channel for the Node's OS. Available options are NodeImage(default), SecurityPatch, Unmanaged, and None."
+  validation {
+    condition     = contains(["None", "NodeImage", "SecurityPatch", "Unmanaged"], var.community_node_os_upgrade_channel)
+    error_message = "ERROR: Valid types are \"None\", \"NodeImage\", \"SecurityPatch\" and \"Unmanaged\"!"
+  }
 }
