@@ -1,4 +1,4 @@
-FROM golang:1.25-bookworm
+FROM golang:1.26-bookworm
 
 # Install OS provided packages
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -30,7 +30,7 @@ RUN mkdir -p /etc/apt/keyrings \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Terratest
-RUN go install github.com/gruntwork-io/terratest/cmd/terratest_log_parser@latest
+RUN go install github.com/gruntwork-io/terratest/cmd/terratest_log_parser@v0.56.0
 
 # Generate a key for tests
 RUN ssh-keygen -f ~/.ssh/id_rsa -P ""
