@@ -1,9 +1,9 @@
-FROM golang:1.25
+FROM golang:1.25-bookworm
 
 # Install terraform from apt repository, terratest_log_parser, jq, azure-cli
 RUN \
-    apt-get update \
-    && apt-get install -y jq lsb-release \
+    apt update \
+    && apt install -y jq lsb-release ca-certificates  \
     && wget -O - https://apt.releases.hashicorp.com/gpg \
         | gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg \
     && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" \
@@ -13,6 +13,9 @@ RUN \
     && ssh-keygen -f ~/.ssh/id_rsa -P "" \
     && go install github.com/gruntwork-io/terratest/cmd/terratest_log_parser@latest \
     && curl -sL https://aka.ms/InstallAzureCLIDeb | bash
+
+# Cleanup
+RUN rm -rf /var/lib/apt/lists/*
 
 WORKDIR /viya4-iac-azure/test
 
