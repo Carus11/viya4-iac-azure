@@ -33,7 +33,7 @@ RUN mkdir -p /etc/apt/keyrings \
 RUN go install github.com/gruntwork-io/terratest/cmd/terratest_log_parser@latest
 
 # Generate a key for tests
-RUN ssh-keygen -f ~/.ssh/id_rsa -P "" \
+RUN ssh-keygen -f ~/.ssh/id_rsa -P ""
 
 WORKDIR /viya4-iac-azure/test
 
