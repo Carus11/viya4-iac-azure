@@ -555,13 +555,13 @@ variable "netapp_service_level" {
 }
 
 variable "netapp_size_in_tb" {
-  description = "When storage_type=ha, Provisioned size of the pool in TB. Value must be between 4 and 500"
+  description = "When storage_type=ha, Provisioned size of the pool in TB. Value must be between 1 and 2048"
   type        = number
   default     = 4
 
   validation {
-    condition     = var.netapp_size_in_tb != null ? var.netapp_size_in_tb >= 4 && var.netapp_size_in_tb <= 500 : null
-    error_message = "ERROR: netapp_size_in_tb - value must be between 4 and 500."
+    condition     = var.netapp_size_in_tb != null ? (var.netapp_size_in_tb >= 4 || (var.netapp_size_in_tb >= 1 && var.netapp_network_features == "Standard") ) && var.netapp_size_in_tb <= 2048 : null
+    error_message = "ERROR: netapp_size_in_tb - value must be between 1 and 2048. If netapp_size_in_tb is less than 4, netapp_network_features must be Standard"
   }
 }
 
@@ -633,6 +633,19 @@ variable "netapp_replication_frequency" {
     condition     = contains(["10minutes", "hourly", "daily"], var.netapp_replication_frequency)
     error_message = "Valid values are: 10minutes, hourly, daily."
   }
+}
+
+# Private DNS Zone variables for ANF CZR resilience
+variable "netapp_dns_zone_name" {
+  description = "Private DNS Zone name for ANF CZR hostname resolution. Used to provide stable NFS mount point during failover."
+  type        = string
+  default     = "sas-viya.internal"
+}
+
+variable "netapp_dns_record_name" {
+  description = "DNS A record name within the Private DNS Zone for NFS mount point. The FQDN will be <record_name>.<zone_name>"
+  type        = string
+  default     = "nfs"
 }
 
 variable "node_pools_availability_zone" {
