@@ -8,12 +8,12 @@
 #
 provider "azurerm" {
 
-  subscription_id = var.subscription_id
-  client_id       = var.client_id
-  client_secret   = var.client_secret
-  tenant_id       = var.tenant_id
-  partner_id      = var.partner_id
-  use_msi         = var.use_msi
+   subscription_id = var.subscription_id
+   client_id       = var.client_id
+   client_secret   = var.client_secret
+   tenant_id       = var.tenant_id
+   partner_id      = var.partner_id
+   use_msi         = var.use_msi
 
   features {}
 }
@@ -224,6 +224,8 @@ module "node_pools" {
   community_priority           = each.value.community_priority 
   community_eviction_policy    = each.value.community_eviction_policy
   community_spot_max_price     = each.value.community_spot_max_price
+  community_os_disk_type       = each.value.community_os_disk_type
+  community_kubelet_disk_type  = each.value.community_kubelet_disk_type  
 
 }
 
@@ -266,6 +268,7 @@ module "netapp" {
   resource_group_name = local.aks_rg.name
   location            = var.location
   subnet_id           = module.vnet.subnets["netapp"].id
+  vnet_id             = module.vnet.id
   network_features    = var.netapp_network_features
   service_level       = var.netapp_service_level
   size_in_tb          = var.netapp_size_in_tb
@@ -282,6 +285,10 @@ module "netapp" {
   netapp_enable_cross_zone_replication = var.netapp_enable_cross_zone_replication
   netapp_replication_zone              = var.netapp_replication_zone
   netapp_replication_frequency         = var.netapp_replication_frequency
+  
+  # Private DNS Zone for CZR resilience
+  netapp_dns_zone_name   = var.netapp_dns_zone_name
+  netapp_dns_record_name = var.netapp_dns_record_name
 }
 
 data "external" "git_hash" {
