@@ -108,7 +108,7 @@ variable "availability_zone" {
   default     = "1"
   
   validation {
-    condition     = var.availability_zone == null || contains(["1", "2", "3"], var.availability_zone)
+    condition     = var.availability_zone == null ? true : contains(["1", "2", "3"], var.availability_zone)
     error_message = "Availability zone must be '1', '2', '3', or null."
   }
 }
@@ -130,7 +130,7 @@ variable "standby_availability_zone" {
   default     = "2"
   
   validation {
-    condition     = var.standby_availability_zone == null || contains(["1", "2", "3"], var.standby_availability_zone)
+    condition     = var.standby_availability_zone == null ? true : contains(["1", "2", "3"], var.standby_availability_zone)
     error_message = "Standby availability zone must be '1', '2', '3', or null."
   }
   
