@@ -524,6 +524,12 @@ variable "create_container_registry" {
   default     = false
 }
 
+variable "container_registry_private" {
+  description = "Create Azure Container Registry with Private Endpoint and disable public access. Requires create_container_registry=true."
+  type        = bool
+  default     = false
+}
+
 variable "container_registry_sku" {
   description = "The SKU name of the container registry. Possible values are `Basic`, `Standard` and `Premium`."
   type        = string

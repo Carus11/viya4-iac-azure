@@ -40,7 +40,7 @@ locals {
   } : {}
 
   # Container Registry
-  container_registry_sku = title(var.container_registry_sku)
+  container_registry_sku = var.container_registry_private ? "Premium" : title(var.container_registry_sku)
 
   aks_rg = (var.resource_group_name == null
     ? azurerm_resource_group.aks_rg[0]

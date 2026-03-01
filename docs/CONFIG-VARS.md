@@ -403,6 +403,7 @@ For complete recovery procedures, see [Multi-ZoneDeploymentGuide.md](user/Multi-
 | Name | Description | Type | Default | Notes |
 | :--- | ---: | ---: | ---: | ---: |
 | create_container_registry| Create container registry instance | bool | false | |
+| container_registry_private | Create ACR with a Private Endpoint and disable public access | bool | false | Required `create_container_registry=true`. This will automatically upgrade the `container_registry_sku` to "Premium" if necessary. |
 | container_registry_sku | Service tier for the registry | string | "Standard" | Possible values: "Basic", "Standard", "Premium" |
 | container_registry_admin_enabled | Enables the admin user | bool | false | |
 | container_registry_geo_replica_locs | List of Azure locations where the container registry should be geo-replicated. | list of strings | null | This is only supported when `container_registry_sku` is set to `"Premium"`. |

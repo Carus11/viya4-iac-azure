@@ -111,7 +111,56 @@ resource "azurerm_container_registry" "acr" {
       tags     = var.tags
     }
   }
+
+  public_network_access_enabled = var.container_registry_private ? false : true
+
   tags = var.tags
+}
+
+resource "azurerm_private_endpoint" "acr" {
+  count               = var.create_container_registry && var.container_registry_private ? 1 : 0
+  name                = "${var.prefix}-acr-pe"
+  location            = var.location
+  resource_group_name = local.aks_rg.name
+  subnet_id           = module.vnet.subnets["misc"].id
+
+  private_service_connection {
+    name                           = "${var.prefix}-acr-psc"
+    is_manual_connection           = false
+    private_connection_resource_id = azurerm_container_registry.acr[0].id
+    subresource_names              = ["registry"]
+  }
+
+  private_dns_zone_group {
+    name                 = "acr-dns-zone-group"
+    private_dns_zone_ids = [azurerm_private_dns_zone.acr[0].id]
+  }
+
+  tags = var.tags
+}
+
+resource "azurerm_private_dns_zone" "acr" {
+  count               = var.create_container_registry && var.container_registry_private ? 1 : 0
+  name                = "privatelink.azurecr.io"
+  resource_group_name = local.aks_rg.name
+  tags                = var.tags
+}
+
+resource "azurerm_private_dns_zone_virtual_network_link" "acr" {
+  count                 = var.create_container_registry && var.container_registry_private ? 1 : 0
+  name                  = "${var.prefix}-acr-vnet-link"
+  resource_group_name   = local.aks_rg.name
+  private_dns_zone_name = azurerm_private_dns_zone.acr[0].name
+  virtual_network_id    = module.vnet.id
+  tags                  = var.tags
+}
+
+resource "azurerm_role_assignment" "acr_pull" {
+  count                            = var.create_container_registry ? 1 : 0
+  principal_id                     = module.aks.kubelet_identity_object_id
+  role_definition_name             = "AcrPull"
+  scope                            = azurerm_container_registry.acr[0].id
+  skip_service_principal_aad_check = true
 }
 
 resource "azurerm_network_security_rule" "acr" {
