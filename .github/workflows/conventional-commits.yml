@@ -16,7 +16,7 @@ jobs:
     steps:
     # https://github.com/marketplace/actions/conventional-commit-in-pull-requests
       - name: PR Conventional Commit Validation
-        uses: ytanikin/pr-conventional-commits@6ac1cea04190fc076b0e539025501d7e7d241ac1 # v1.4.0
+        uses: ytanikin/pr-conventional-commits@639145d78959c53c43112365837e3abd21ed67c1 # v1.5.2
         with:
           task_types: '["fix", "feat", "build", "chore", "ci", "docs", "style", "refactor", "perf", "test"]'
           custom_labels: '{"feat": "enhancement", "fix": "bug", "docs": "documentation", "ci": "CI/CD", "perf": "performance"}'
